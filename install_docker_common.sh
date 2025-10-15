@@ -1,5 +1,5 @@
 #!/bin/bash
-# Ubuntu 서버용 Docker 엔진 및 권한 설정 자동화
+# Ubuntu 서버용 Docker 엔진 및 권한 설정 자동화 (GitHub 버전)
 # by 채티 for 치님
 
 set -e
