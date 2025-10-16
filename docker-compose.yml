@@ -36,16 +36,14 @@ services:
     networks:
       - monitoring_net
     deploy:
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
+      mode: global      # 모든 노드에서 한 개씩 실행
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     ports:
-      - "9323:9323"
+      - "9323:9323"   # 각 노드에서 다른 포트로 접근 가능
 
 networks:
   monitoring_net:
