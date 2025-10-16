@@ -1,15 +1,23 @@
 #!/bin/bash
 set -e
 
-echo "=== Swarm Monitoring Deployment ==="
+echo "=== Swarm Monitoring Full Auto Deployment ==="
 
 # 1️⃣ 환경 변수 입력
-read -p "매니저 노드 호스트명: " MANAGER
-read -p "워커 노드 1 호스트명: " WORKER1
-read -p "워커 노드 2 호스트명: " WORKER2
-read -p "워커 노드 3 호스트명: " WORKER3
+read -p "매니저 노드 호스트명/IP: " MANAGER
+read -p "워커 노드 1 호스트명/IP: " WORKER1
+read -p "워커 노드 2 호스트명/IP: " WORKER2
+read -p "워커 노드 3 호스트명/IP: " WORKER3
 
-# Prometheus 설정 파일 자동 업데이트
+NODES=("$MANAGER" "$WORKER1" "$WORKER2" "$WORKER3")
+
+# 2️⃣ Prometheus scrape_targets 자동 생성
+TARGETS=""
+for NODE in "${NODES[@]}"; do
+  TARGETS="$TARGETS'$NODE:9323',"
+done
+TARGETS=${TARGETS%,}  # 마지막 콤마 제거
+
 cat > prometheus/prometheus.yml <<EOL
 global:
   scrape_interval: 15s
@@ -17,12 +25,12 @@ global:
 scrape_configs:
   - job_name: 'docker'
     static_configs:
-      - targets: ['$MANAGER:9323','$WORKER1:9323','$WORKER2:9323','$WORKER3:9323']
+      - targets: [$TARGETS]
 EOL
 
 echo "✅ prometheus.yml 업데이트 완료"
 
-# 2️⃣ Swarm 스택 배포
+# 3️⃣ Swarm 스택 배포
 docker stack deploy -c docker-compose.yml monitoring
 echo "✅ Swarm Monitoring Stack 배포 완료"
 
